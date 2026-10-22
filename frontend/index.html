@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Morning Pilot — Minimalist voice-first personal morning audio briefing. Apple-inspired design with real-time news intelligence.">
+  <title>Morning Pilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-top-right"></div>
+  <div class="ambient-glow glow-center"></div>
+
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Onboarding overlay (first-time setup) -->
+  <div class="onboarding-overlay" id="onboarding-overlay">
+    <div class="onboarding-card glass-panel">
+      <div class="onboarding-header">
+        <div class="brand-glyph">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5v14M7 5v14M22 9v6M2 9v6"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="onboarding-title">Morning Pilot</h2>
+          <p class="onboarding-subtitle">Your personal voice news host</p>
+        </div>
+      </div>
+
+      <div class="onboarding-body">
+        <label class="input-label" for="onboarding-name">Your Name</label>
+        <input
+          type="text"
+          class="text-input"
+          id="onboarding-name"
+          placeholder="Enter your name"
+          value="Piyush"
+        >
+
+        <label class="input-label">Select Your Preferred Topics</label>
+        <div class="topic-picker" id="onboarding-topics">
+          <!-- Populated by JS -->
+        </div>
+
+        <button class="primary-btn full-width" id="onboarding-save">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Wrapper -->
+  <div class="app-layout">
+    <!-- Apple-style Glass Navigation Header -->
+    <header class="app-header glass-panel">
+      <div class="header-left">
+        <div class="brand-badge">
+          <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5v14M7 5v14M22 9v6M2 9v6"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">Morning Pilot</span>
+            <span class="brand-status-tag" id="header-date">Today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <nav class="nav-segmented-control">
+          <button class="nav-tab active" data-tab="briefing" id="tab-briefing">Briefing</button>
+          <button class="nav-tab" data-tab="conversation" id="tab-conversation">Voice Q&A</button>
+          <button class="nav-tab" data-tab="profile" id="tab-profile">Topics</button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <button class="action-btn-primary" id="hero-generate-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>Generate Briefing</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Stage -->
+    <main class="main-stage">
+      
+      <!-- HERO VOICE STAGE: Visible Interactive Circle in Center -->
+      <section class="voice-hero-stage">
+        <div class="voice-orb-wrapper">
+          <!-- Ripple wave animations -->
+          <div class="voice-ripple voice-ripple-1"></div>
+          <div class="voice-ripple voice-ripple-2"></div>
+          <div class="voice-ripple voice-ripple-3"></div>
+
+          <!-- Central Voice Orb Circle -->
+          <button class="voice-orb" id="voice-orb" title="Click to Play or Pause">
+            <div class="orb-inner">
+              <div class="orb-wave-bars">
+                <span class="wave-bar bar-1"></span>
+                <span class="wave-bar bar-2"></span>
+                <span class="wave-bar bar-3"></span>
+                <span class="wave-bar bar-4"></span>
+                <span class="wave-bar bar-5"></span>
+              </div>
+              <div class="orb-play-icon" id="orb-play-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 3 20 12 6 21 6 3"/>
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Live Status Pill -->
+        <div class="status-pill" id="player-status-pill">
+          <span class="status-dot" id="player-status-dot"></span>
+          <span class="status-label" id="player-status-text">Ready to play</span>
+        </div>
+
+        <!-- Integrated Question & Interrupt Input Bar (Just Below Voice Circle) -->
+        <div class="hero-ask-container">
+          <div class="glass-input-pill" id="floating-ask-bar">
+            <div class="input-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              class="ask-input"
+              id="question-input"
+              placeholder="Ask a question or speak to interrupt..."
+              autocomplete="off"
+            >
+            <div class="input-actions">
+              <button class="action-icon-btn mic-btn" id="mic-btn" title="Tap to speak or interrupt with voice">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                </svg>
+              </button>
+              <button class="action-icon-btn send-btn" id="send-btn" title="Send question">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <p class="ask-hint">Speak or type anytime. Asking a question automatically pauses and delves into live details.</p>
+        </div>
+
+        <!-- Sleek Audio Player Timeline Scrubber -->
+        <div class="minimal-scrubber-card glass-panel" id="player-card">
+          <div class="scrubber-top">
+            <div class="player-info">
+              <span class="player-title" id="player-title">Today's Spoken Episode</span>
+              <span class="player-date" id="player-date"></span>
+            </div>
+            <button class="mini-play-btn" id="play-btn" title="Play / Pause" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 3 20 12 6 21 6 3"/>
+              </svg>
+            </button>
+          </div>
+          <div class="scrubber-track-wrap">
+            <div class="progress-bar" id="progress-bar">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="time-display">
+              <span id="time-current">0:00</span>
+              <span id="time-total">0:00</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pipeline progress steps (visible during generation) -->
+      <div class="pipeline-container glass-panel" id="pipeline-steps" style="display: none;"></div>
+
+      <!-- Tab Content Area -->
+      <div class="content-body">
+        
+        <!-- Tab 1: Briefing Stories & Transcript -->
+        <div class="page-section active" id="section-briefing">
+          <div class="two-column-grid">
+            
+            <!-- Left: Stories in Briefing -->
+            <div class="column-left">
+              <div class="section-card glass-panel" id="stories-card" style="display: none;">
+                <div class="card-header">
+                  <div class="header-title-wrap">
+                    <div class="header-glyph">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                      </svg>
+                    </div>
+                    <h3 class="card-title">Stories in This Briefing</h3>
+                  </div>
+                </div>
+                <div class="stories-grid" id="stories-grid">
+                  <!-- Generated by JS -->
+                </div>
+              </div>
+
+              <!-- Collapsible/Readable Transcript Card -->
+              <div class="section-card glass-panel" id="transcript-card" style="display: none;">
+                <div class="card-header">
+                  <div class="header-title-wrap">
+                    <div class="header-glyph">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                      </svg>
+                    </div>
+                    <h3 class="card-title">Spoken Broadcast Script</h3>
+                  </div>
+                </div>
+                <div class="transcript-viewport">
+                  <p class="transcript-text" id="transcript-text"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Tracked Topics & Live Updates -->
+            <div class="column-right">
+              <!-- Interests Sidebar -->
+              <div class="section-card glass-panel">
+                <div class="card-header">
+                  <div class="header-title-wrap">
+                    <div class="header-glyph">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                      </svg>
+                    </div>
+                    <h3 class="card-title">Your Topic Profile</h3>
+                  </div>
+                </div>
+                <div class="interests-list" id="interests-list">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+
+              <!-- Dynamic Interest Evolution Feed -->
+              <div class="section-card glass-panel">
+                <div class="card-header">
+                  <div class="header-title-wrap">
+                    <div class="header-glyph">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                      </svg>
+                    </div>
+                    <h3 class="card-title">Dynamic Evolution</h3>
+                  </div>
+                </div>
+                <div class="updates-feed" id="updates-feed">
+                  <div class="empty-feed">
+                    <span>Topic weightings adjust in real-time as you ask questions or skip topics.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 2: Voice Q&A / Conversation Feed -->
+        <div class="page-section" id="section-conversation">
+          <div class="section-card glass-panel max-width-center">
+            <div class="card-header">
+              <div class="header-title-wrap">
+                <div class="header-glyph">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </div>
+                <h3 class="card-title">Conversation History</h3>
+              </div>
+            </div>
+            <div class="conversation-feed" id="conversation-messages">
+              <div class="empty-state" id="conversation-empty">
+                <div class="empty-glyph">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>
+                  </svg>
+                </div>
+                <h4>Spoken Q&A Standby</h4>
+                <p>Ask anything about today's stories above or speak into the microphone to go deeper.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Profile Topics Management -->
+        <div class="page-section" id="section-profile">
+          <div class="section-card glass-panel max-width-center">
+            <div class="card-header space-between">
+              <div class="header-title-wrap">
+                <div class="header-glyph">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+                <h3 class="card-title">Manage Interests</h3>
+              </div>
+              <button class="secondary-btn" id="edit-profile-btn">Edit Topics</button>
+            </div>
+
+            <div class="profile-settings-body">
+              <div class="form-group">
+                <label class="input-label" for="profile-name">User Name</label>
+                <input type="text" class="text-input" id="profile-name" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="input-label">Tracked Topic Tags</label>
+                <div class="topic-picker" id="profile-topics"></div>
+              </div>
+
+              <button class="primary-btn" id="save-profile-btn" style="display: none;">
+                Save Topic Changes
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Hidden audio elements -->
+  <audio id="audio-player" preload="none"></audio>
+  <audio id="answer-audio" preload="none"></audio>
+
+  <!-- Application Modules -->
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/transcript.js"></script>
+  <script src="js/conversation.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

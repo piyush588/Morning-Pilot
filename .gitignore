@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data (runtime generated)
+app/data/briefings/
+app/data/profiles/
+app/data/cache/
+
+# OS
+.DS_Store
+Thumbs.db
