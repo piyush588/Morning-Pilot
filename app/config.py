@@ -35,7 +35,12 @@ class Settings(BaseSettings):
     briefing_max_stories: int = Field(default=5)
     briefing_max_duration: int = Field(default=300)
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
+
+    @property
+    def effective_port(self) -> int:
+        import os
+        return int(os.environ.get("PORT", self.app_port))
 
 
 settings = Settings()

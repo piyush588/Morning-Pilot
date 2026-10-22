@@ -47,10 +47,14 @@ app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 if __name__ == "__main__":
     import uvicorn
+    import os
+
+    port = settings.effective_port
+    is_prod = bool(os.environ.get("PORT"))
 
     uvicorn.run(
         "app.main:app",
         host=settings.app_host,
-        port=settings.app_port,
-        reload=True,
+        port=port,
+        reload=not is_prod,
     )
