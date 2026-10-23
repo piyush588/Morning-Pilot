@@ -85,13 +85,22 @@ def _generate_fallback_script(user_name: str, date_str: str, stories: list[dict]
     if stories:
         lines.append("Here's what you need to know today.")
         for i, s in enumerate(stories, 1):
-            headline = s.get("headline", "")
-            summary = s.get("summary", "")
+            headline = s.get("headline", "").strip()
+            summary = s.get("summary", "").strip()
             topic = s.get("interest_match", "the news")
             sources = s.get("sources", [])
             source_name = sources[0].get("title", "our sources") if sources else "live reports"
             prefix = "First, in" if i == 1 else "Next, turning to"
-            lines.append(f"{prefix} {topic}: {headline}. As {source_name} reports, {summary[:250]}.")
+            
+            # Avoid repeating the headline if summary is identical or redundant
+            clean_summary = summary
+            if clean_summary and clean_summary.lower().startswith(headline.lower()):
+                clean_summary = clean_summary[len(headline):].strip(" -–:., ")
+            
+            if clean_summary and len(clean_summary) > 15 and clean_summary.lower() != headline.lower():
+                lines.append(f"{prefix} {topic}: {headline}. As {source_name} reports, {clean_summary[:250]}.")
+            else:
+                lines.append(f"{prefix} {topic}: {headline}, with recent coverage from {source_name}.")
     else:
         lines.append(
             "We checked for live updates across your tracked topics in AI, Cricket, Startups, and Markets. "

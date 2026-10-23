@@ -7,8 +7,9 @@ from pydantic import Field
 class Settings(BaseSettings):
     """All config via .env or environment variables."""
 
-    # TinyFish
+    # TinyFish & News APIs
     tinyfish_api_key: str = Field(default="", description="TinyFish API key")
+    gnews_api_key: str = Field(default="", description="Optional GNews.io free API key")
 
     # ElevenLabs
     elevenlabs_api_key: str = Field(default="", description="ElevenLabs API key")

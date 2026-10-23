@@ -103,15 +103,20 @@ async def generate_briefing(
             continue
         seen_headlines.add(headline)
 
-        text = fetched.get("text", "")
-        summary = text[:500] + "..." if len(text) > 500 else text
-        if not summary and search_result:
-            summary = search_result.get("snippet", "")
+        text = fetched.get("text", "").strip()
+        snippet = search_result.get("snippet", "").strip() if search_result else ""
+        if len(text) >= 100:
+            summary = text[:500] + "..." if len(text) > 500 else text
+        elif snippet and len(snippet) > 20:
+            summary = snippet
+        elif text:
+            summary = text
+        else:
+            summary = snippet or headline
 
         source_title = (
-            search_result.get("source", search_result.get("title", headline))
-            if search_result
-            else fetched.get("title", headline)
+            (search_result.get("source") if search_result else None)
+            or "News Reports"
         )
 
         story = Story(
